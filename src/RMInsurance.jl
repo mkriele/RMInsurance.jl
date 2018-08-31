@@ -52,6 +52,12 @@ import LinearAlgebra.⋅
 es(x, α) =
   mean(sort(x, rev = true)[1:ceil(Integer, (1 - α) * length(x))])
 
+# Chain Ladder --------------------------------------------------
+include("ChainLadder/ChainLadderMack.jl")
+
+# Hull White Black Scholes --------------------------------------
+include("HullwhiteBlackScholes/HullwhiteBlackScholes.jl")
+
 # Simplfied Swiss Solvency Test----------------------------------
 include("SST/SST__Types.jl")
 include("SST/SST_Functions.jl")

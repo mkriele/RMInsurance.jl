@@ -5,6 +5,8 @@ using Random
 using LinearAlgebra
 import LinearAlgebra.⋅
 
+println("Testing ChainLadder")
+include("ChainLadder_Test.jl")
 println("Testing S2 Life")
 include("S2Life_Test.jl")
 println("Testing SST Life")
