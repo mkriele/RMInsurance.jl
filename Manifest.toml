@@ -69,6 +69,12 @@ uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
 deps = ["Mmap"]
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 
+[[Dierckx]]
+deps = ["BinaryProvider", "Libdl", "Random", "Test"]
+git-tree-sha1 = "7905f89a2beef5564c62fdf7aad1d0ef68b13239"
+uuid = "39dd38d3-220a-591b-8e3c-4c3a8c710a94"
+version = "0.4.0"
+
 [[Distributed]]
 deps = ["LinearAlgebra", "Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"

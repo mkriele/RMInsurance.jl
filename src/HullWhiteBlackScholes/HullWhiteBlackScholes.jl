@@ -40,7 +40,7 @@ function HWBS(p::Dict{Symbol, Real}, df_spot::DataFrame)
   prices = DataFrame()
   prices[:t] = df_spot[:t]
   prices[:spot] = df_spot[:spot]
-  prices[:zb] = exp(-prices[:t] .* prices[:spot])
+  prices[:zb] = exp.(-prices[:t] .* prices[:spot])
   # Instantaneous forward rates
   # Approximate last forward with previous forward
   prices[:forw] =
