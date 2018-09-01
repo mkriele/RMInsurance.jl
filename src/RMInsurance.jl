@@ -56,7 +56,7 @@ es(x, α) =
 include("ChainLadder/ChainLadderMack.jl")
 
 # Hull White Black Scholes --------------------------------------
-include("HullwhiteBlackScholes/HullwhiteBlackScholes.jl")
+include("HullWhiteBlackScholes/HullWhiteBlackScholes.jl")
 
 # Simplfied Swiss Solvency Test----------------------------------
 include("SST/SST__Types.jl")
