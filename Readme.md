@@ -1,6 +1,6 @@
 # RMInsurance
 
-[![Build Status](https://travis-ci.org/mkriele/RMInsurance.jl.svg?branch=master)](https://travis-ci.org/mkriele/RMInsurnce.jl)
+[![Build Status](https://travis-ci.org/mkriele/RMInsurance.jl.svg?branch=master)](https://travis-ci.org/mkriele/RMInsurance.jl)
 
 The package will provide examples for the second edition of the of the book _Value-Oriented Risk Management of Insurance Companies_
 
