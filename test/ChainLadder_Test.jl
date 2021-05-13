@@ -4,18 +4,21 @@ using Test
 using CSV
 
 ### TESTS
-curr_dir = dirname(@__FILE__())
+curr_dir = @__DIR__
+
 
 println("start test ChainLadder_Test.jl...")
 # We use the example from Mack's 1993-paper
 # Cumulated claim amounts
 
-cum_triangle =
-  CSV.read(curr_dir * "/ChainLadderMack_Input.csv", header = false)
-replacena!(cum_triangle, 0.0)
-cum_triangle =  convert(Array{Real,2}, cum_triangle)
+## First code cell
+cum_triangle = CSV.File(curr_dir * "/ChainLadderMack_Input.csv", 
+                        header=false, ignoreemptylines=true) |> DataFrame
+cum_triangle = Matrix(cum_triangle)
+cum_triangle = convert.(Float64, cum_triangle)
 
-triangle =cum2claims(cum_triangle)
+## Next code cell
+triangle =cum2claims(cum_triangle)      
 @test cum_triangle ≈ claims2cum(triangle)
 
 mack = Mack(cum_triangle, cum=true)
@@ -32,3 +35,4 @@ mack = Mack(cum_triangle, cum=true)
 @test 0.13 ≈ round(√(mack.tot_mse)/mack.tot_res, digits = 2)
 
 println("...end test ChainLadder_Test.jl")
+

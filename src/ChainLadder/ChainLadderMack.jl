@@ -1,4 +1,5 @@
 using DataFrames
+using LinearAlgebra
 
 export Mack, claims2cum, cum2claims, cum2futureclaims, replacena!
 """
@@ -8,21 +9,21 @@ mutable struct Mack
   "Length of history"
   I::Int
   "Cummulative claims (upper triangle)"
-  cum::Matrix{Real}
+  cum::Matrix{Float64}
   "Time vector of development factors"
-  f::Vector{Real}
+  f::Vector{Float64}
   "Time vector of future claims payments"
-  futureclaims::Vector{Real}
+  futureclaims::Vector{Float64}
   "Vector of reseves"
-  res::Vector{Real}
+  res::Vector{Float64}
   """
   Total reserves: ``\\mathit{tot\\_res} =\\sum_{i=1}^I \\mathit{res}_i``
   """
-  tot_res::Real
+  tot_res::Float64
   "Vector of mean square errors"
-  mse::Vector{Real}
+  mse::Vector{Float64}
   "Total mean square error"
-  tot_mse::Real
+  tot_mse::Float64
 end
 
 
@@ -34,7 +35,7 @@ end
 #   Mack(convert(Array{Real,2}, da_triang, 0); cum = cum)
 # end
 
-function Mack(triang::Array{Real,2}; cum::Bool = false)
+function Mack(triang::Matrix{Float64}; cum::Bool = false) 
   if cum
     C = deepcopy(triang)
   else
@@ -47,7 +48,7 @@ function Mack(triang::Array{Real,2}; cum::Bool = false)
   # Ultimate claim amounts
   for 𝑘  ∈ 2:I
     for 𝑙 ∈ (I+1-𝑘+1):I
-      C[𝑘,𝑙] = C[𝑘,I+1-𝑘] * prod(f[(I+1-𝑘):(𝑙-1)])
+      C[𝑘,𝑙] = C[𝑘,I+1-𝑘] * prod(f[(I+1-𝑘):( 𝑙 -1)])
     end
   end
   futclaims = cum2futureclaims(C)
@@ -59,7 +60,7 @@ function Mack(triang::Array{Real,2}; cum::Bool = false)
     for 𝑘 ∈ 1:(I-1)]
   σ²[I-1] = min(σ²[I-2]^2 / σ²[I-3], min(σ²[I-3],σ²[I-2]))
   # mean square error
-  mse = zeros(Real, I)
+  mse = zeros(Float64, I)
   for 𝑖 ∈ 2:I
     mse[𝑖] = 0
     for 𝑘 ∈ (I+1-𝑖):(I-1)
@@ -99,7 +100,7 @@ upperleft(quadrat_mat::Array{Real,2})
 
 Sets all values in the strict lower right triangle to 0.
 """
-function upperleft(quadrat_mat::Array{T, 2}) where T <: Real
+function upperleft(quadrat_mat::Matrix{T}) where T <: Real 
   c = deepcopy(quadrat_mat)
   n = size(c,1)
   if n ≠ size(c,2)
@@ -116,22 +117,22 @@ lowerright(quadrat_mat::Array{Real,2})
 
 Sets all values in the upperleft triangle (incl. diagonal) to 0.
 """
-function lowerright(quadrat_mat::Array{T, 2}) where T <: Real
+function lowerright(quadrat_mat::Matrix{T}) where T <: Real 
   quadrat_mat - upperleft(quadrat_mat)
 end
 
 """
-    claims2cum(c::Array{Real,2})
+    claims2cum(c::Matrix)
 
     Convert a quadratic upper left triangular reserve matrix to
     the correponding cumulative triangular reserve matrix.
     The (strictly) lower triangular part is set to 0
 """
-function claims2cum(c::Array{Real,2})
+function claims2cum(c::Matrix{T}) where T <: Real 
   if size(c,1) ≠ size(c,2)
     error("claims2cum: Matrix is not quadratic")
   end
-  cum = zeros(Real,size(c))
+ # cum = zeros(Real,size(c))
   #for i in 1:size(c, 1)
     #cum[i,1:size(c, 1)-i+1] = cumsum(c[i,1:size(c, 1)-i+1], 2)
   #end
@@ -139,17 +140,17 @@ function claims2cum(c::Array{Real,2})
 end
 
 """
-    cum2claims(c::Array{Real,2})
+    cum2claims(c::Matrix)
 
     Convert a quadratic cumulative claims matrix into a
     claims matrix.
 """
-function cum2claims(c::Array{Real,2})
+function cum2claims(c::Matrix{T}) where T <: Real 
   I = size(c,2)
   if size(c,1) ≠ I
     error("cum2claims: Matrix is not quadratic")
   end
-  claims = zeros(Real,size(c))
+  claims = zero(c)
   for 𝑖 ∈ 1:I
     claims[𝑖,1] = c[𝑖,1]
     for 𝑘 ∈ 2:I
@@ -166,14 +167,14 @@ end
     (strictly) lower triangle of a projected cumulative claims
     matrix
 """
-function cum2futureclaims(c::Array{Real,2})
+function cum2futureclaims(c::Matrix{T}) where T <: Real 
   I = size(c,2)
   if size(c,1) ≠ I
     error("cumclaims: Matrix is not quadratic")
   end
   claims = cum2claims(c)
-  futureclaims = zeros(Real,I-1)
-  for 𝑘 ∈ 2:I
+  futureclaims = zero(claims[1:(I-1), 1])
+   for 𝑘 ∈ 2:I
     futureclaims[𝑘-1] = sum(claims[I-𝑘+2:I,𝑘])
   end
   futureclaims

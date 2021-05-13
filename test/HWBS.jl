@@ -9,7 +9,7 @@ using CSV
 import RMInsurance.zb
 
 ### TESTS
-curr_dir = dirname(@__FILE__())
+curr_dir = @__DIR__
 
 println("start HWBS.jl...")
 
@@ -18,18 +18,18 @@ println("start HWBS.jl...")
 # constains spot rates for different measurement dates
 # (columns :xyyyy_mm, where yyyy is the year and mm the month)
 # and the corresponding Durations (column :Duration).
-df_chf_spots = CSV.read( curr_dir * "/HWBS_Input_CHF_Spot.csv",
-                          header = true)
+df_chf_spots = CSV.File( curr_dir * "/HWBS_Input_CHF_Spot.csv",
+                          header = true) |> DataFrame
 # contains various short rates ("SARON", "Overnight",
 # "MM_3months") for different measurement dates
-df_chf_shorts = CSV.read(curr_dir * "/HWBS_Input_CHF_Short.csv",
-                          header = true)
+df_chf_shorts = CSV.File(curr_dir * "/HWBS_Input_CHF_Short.csv",
+                          header = true) |> DataFrame
 # parameters for the Hull-White Black-Scholes model
-hwpar = CSV.read(curr_dir * "/HWBS_Input_Parameters.csv",
-                  header = true)
+hwpar = CSV.File(curr_dir * "/HWBS_Input_Parameters.csv",
+                  header = true) |> DataFrame
 # Asset portfolio
-assets = CSV.read( curr_dir * "/HWBS_Input_Portfolio.csv",
-                    header = true)
+assets = CSV.File( curr_dir * "/HWBS_Input_Portfolio.csv",
+                    header = true) |> DataFrame
 
 # t₀ refers to the time at which we will base the spot curve
 # it is given as a column identifyer for df_chf_spots_sparse
@@ -40,11 +40,11 @@ t₀ =  Symbol("2016-09")  #:x2016_09
 # This is used for extrapolation to spot rates with
 # duration < 1 year
 spot₀ =
-  df_chf_shorts[findall(x->x=="SARON",df_chf_shorts[:Type])[1], t₀]
+  df_chf_shorts[findall(x->x=="SARON",df_chf_shorts[!, :Type])[1], t₀]
 
 df_spot_coarse = DataFrame()
-df_spot_coarse[:t] = vcat(0.0, df_chf_spots[:Duration])
-df_spot_coarse[:spot] = vcat(spot₀, df_chf_spots[t₀])
+df_spot_coarse[!, :t] = vcat(0.0, df_chf_spots[!, :Duration])
+df_spot_coarse[!, :spot] = vcat(spot₀, df_chf_spots[!, t₀])
 
 
 
@@ -54,10 +54,10 @@ dict_hwpar =
 
 function spot_coarse2fine(nʸ, df_spot_coarse)
   δt = 1 / nʸ
-  nᵀ = maximum(df_spot_coarse[:t]) * nʸ
+  nᵀ = maximum(df_spot_coarse[!, :t]) * nʸ
   func_spot =
-    Spline1D( convert(Array, df_spot_coarse[:t]),
-              convert(Array, df_spot_coarse[:spot]))
+    Spline1D( convert(Array, df_spot_coarse[!, :t]),
+              convert(Array, df_spot_coarse[!, :spot]))
   # Durations and corresponding spot rates
   DataFrame(t = collect(1:nᵀ) * δt,
             spot = func_spot(collect(1:nᵀ) * δt))
@@ -97,15 +97,15 @@ for 𝑟𝑜𝑤 ∈ 1:nrow(assets)
     V₁[𝑟𝑜𝑤, :] = V₀[𝑟𝑜𝑤] * S₁
   else
     V₀[𝑟𝑜𝑤] =
-      zb(hw, assets[𝑟𝑜𝑤, :Maturity]) * assets[𝑟𝑜𝑤, :Nominal]
+      zb(hw, assets[𝑟𝑜𝑤, :Maturity]) * assets[ 𝑟𝑜𝑤, :Nominal]
     zb_tmp(r) = zb(hw, r, t₁, assets[𝑟𝑜𝑤, :Maturity])
     V₁[𝑟𝑜𝑤, :] = zb_tmp.(r₁) * assets[𝑟𝑜𝑤, :Nominal]
   end
-  loss[asset_id[𝑟𝑜𝑤]] = V₀[𝑟𝑜𝑤] .- discount * V₁[𝑟𝑜𝑤,:]
+  loss[!, asset_id[𝑟𝑜𝑤]] = V₀[𝑟𝑜𝑤] .- discount * V₁[𝑟𝑜𝑤,:]
 end
-loss[:total] = sum(loss[asset_id[𝑟𝑜𝑤]] for 𝑟𝑜𝑤 ∈ 1:nrow(assets))
+loss[!, :total] = sum(loss[!, asset_id[𝑟𝑜𝑤]] for  𝑟𝑜𝑤  ∈ 1:nrow(assets))
 
-es_assets = es(loss[:total], 0.99)
+es_assets = es(loss[!, :total], 0.99)
 
 
 println("...end HWBS.jl")

@@ -38,22 +38,22 @@ The input `df_spot` has at least two columns:
 """
 function HWBS(p::Dict{Symbol, Real}, df_spot::DataFrame)
   prices = DataFrame()
-  prices[:t] = df_spot[:t]
-  prices[:spot] = df_spot[:spot]
-  prices[:zb] = exp.(-prices[:t] .* prices[:spot])
+  prices[!, :t] = df_spot[!, :t]
+  prices[!, :spot] = df_spot[!, :spot]
+  prices[!, :zb] = exp.(-prices[!, :t] .* prices[!, :spot])
   # Instantaneous forward rates
   # Approximate last forward with previous forward
-  prices[:forw] =
+  prices[!, :forw] =
     vcat( prices[1:(end-1), :t] .*
-            diff(prices[:spot]) ./ diff(prices[:t]),
+            diff(prices[!, :spot]) ./ diff(prices[!, :t]),
           prices[end, :t] *
-            diff(prices[:spot])[end] /
-            diff(prices[:t])[end])
+            diff(prices[!, :spot])[end] /
+            diff(prices[!, :t])[end])
   ## the differences are not long enough and the last entry
   ## is not correct
   ## Approximate correction: repeat the last (correct) value twice
-  tmp =  diff(prices[:forw]) ./ diff(prices[:t])
-  prices[:dforw] =
+  tmp =  diff(prices[!, :forw]) ./ diff(prices[!, :t])
+  prices[!, :dforw] =
     vcat(tmp[1:end-1], tmp[end-1], tmp[end-1])
 
   HWBS( p[:nʸ], df_spot[1,:spot], p[:r∞], p[:a], p[:σ],
