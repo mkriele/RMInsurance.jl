@@ -1,7 +1,7 @@
 # RMInsurance
 
-[![Build Status](https://travis-ci.com/mkriele/RMInsurance.jl.svg?branch=master)](https://travis-ci.com/mkriele/RMInsurance.jl)
-[![Coverage Status](https://coveralls.io/repos/github/mkriele/RMInsurance.jl/badge.svg?branch=master)](https://coveralls.io/github/mkriele/RMInsurance.jl?branch=master)
+[![CI](https://github.com/mkriele/RMInsurance.jl/workflows/CI/badge.svg)](https://github.com/mkriele/RMInsurance.jl/actions)
+
 
 The package will provide examples for the second edition of the of the book _Value-Oriented Risk Management of Insurance Companies_
 
