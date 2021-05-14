@@ -2,11 +2,15 @@ using RMInsurance
 
 using Distributions
 using DataFrames
+using Random
 
 include("ECModel_Input.jl")
 
 println("Start ECModel ...")
 #################################################################
+const BU = 1
+const TOTAL = 2
+
 "Create DataFrame from information on business units and total"
 function getdf(bu, total)
   df =  DataFrame(BU = Array{Symbol}(undef, 0),
@@ -99,9 +103,9 @@ function riskprice(ins_input::DataFrame,
     ins[row_l, :re_costs] = ins_input[row_l, :re_costs] * fac_i
     ins[row_f, :re_costs] = ins_input[row_f, :re_costs] * fac_f
 
-    bu, total =
+    bu =
       project(ins, inv_input, tau_kendall, n_scen, α, s,
-              costs_fixed)
+            costs_fixed)[BU]
     rorac_gross_i[𝑖] = bu[row_l].gross.rorac
     rorac_gross_f[𝑖] = bu[row_f].gross.rorac
 
@@ -140,9 +144,9 @@ function optcap(ins_input::DataFrame,
   for 𝑖 ∈ 1:i_max
     Random.seed!(seed)
     inv[1,:init] = invest_init[𝑖]
-    bu, total =
+    total =
       project(ins_input, inv, tau_kendall,
-              n_scen, α, s, cost_fixed)
+              n_scen, α, s, cost_fixed)[TOTAL]
     profit_net[𝑖] = total.net.profit_mean
     ec_net[𝑖] = total.net.eco_cap
     rorac_net[𝑖] = total.net.rorac
@@ -177,7 +181,7 @@ function optrefire(ins_input::DataFrame,
                    cost_fixed::Real)
   ins = deepcopy(ins_input)
   n_points = 21
-  points = zeros(Real, n_points+1, 4)
+ # points = zeros(Real, n_points+1, 4)
 
   i_opt = 0
   ceded_opt = 0
@@ -197,9 +201,9 @@ function optrefire(ins_input::DataFrame,
     Random.seed!(seed)
     ceded[𝑖] = (𝑖-1) / (n_points-1)
     ins[row_f, :re_ceded] = ceded[𝑖]
-    bu, total =
+    total =
       project(ins, inv_input, tau_kendall,
-      n_scen, α, s, cost_fixed)
+      n_scen, α, s, cost_fixed)[TOTAL]
     ec_net[𝑖] = total.net.eco_cap
     profit_net[𝑖] = total.net.profit_mean
     rorac_net[𝑖] = total.net.rorac
@@ -242,9 +246,9 @@ function optreraroc(ins_input::DataFrame,
     for 𝑏 ∈ 1:nrow(ins)
       ins[𝑏, :re_ceded] = ceded[𝑏, 𝑖]
     end
-    bu, total =
+    total =
       project(ins, inv_input, tau_kendall,
-              n_scen, α, s, cost_fixed)
+              n_scen, α, s, cost_fixed)[TOTAL]
     profit_net[𝑖] = total.net.profit_mean
     ec_net[𝑖] = total.net.eco_cap
     rorac_net[𝑖] = total.net.rorac
@@ -289,9 +293,9 @@ function optreeva(ins_input::DataFrame,
     for 𝑏 ∈ 1:nrow(ins)
       ins[𝑏, :re_ceded] = ceded[𝑏, 𝑖]
     end
-    bu, total =
+    total =
       project(ins, inv_input, tau_kendall,
-              n_scen, α, s, cost_fixed)
+              n_scen, α, s, cost_fixed)[TOTAL]
     avg_ceded[𝑖] =
       ins[!,:re_ceded] ⋅ ins[!,:premium] /sum(ins[!,:premium])
     eva_net[𝑖] =
@@ -351,9 +355,9 @@ function optre(ins_input::DataFrame,
     #   ins[b, :re_ceded] = ceded[b, i]
     # end
     ins[:, :re_ceded] = ceded[:, 𝑖]
-    bu, total =
+    total =
       project(ins, inv_input, tau_kendall,
-              n_scen, α, s, cost_fixed)
+              n_scen, α, s, cost_fixed)[TOTAL]
     profit_net[𝑖] = total.net.profit_mean
     ec_net[𝑖] = total.net.eco_cap
     rorac_net[𝑖] = total.net.rorac

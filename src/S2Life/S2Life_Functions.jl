@@ -259,7 +259,7 @@ unlikely to change the set of identified model points.
 **Changed:** `bio::S2LifeBio  (bio.mp_select)`
 """
 function selectmort!(p::ProjParam, bio::S2LifeBio)
-  invs = InvPort(p.t_0, p.T, p.cap_mkt, p.invs_par...)
+  #invs = InvPort(p.t_0, p.T, p.cap_mkt, p.invs_par...)
   for 𝑠𝑦𝑚𝑏 ∈ collect(keys(bio.shock))
     merge!(bio.mp_select,
            Dict(𝑠𝑦𝑚𝑏 => Array{Bool}(undef, length(p.l_ins.mps))))
