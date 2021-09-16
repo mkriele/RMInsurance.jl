@@ -13,7 +13,7 @@ println("start test ChainLadder_Test.jl...")
 
 ## First code cell
 cum_triangle = CSV.File(curr_dir * "/ChainLadderMack_Input.csv", 
-                        header=false, ignoreemptylines=true) |> DataFrame
+                        header=false, ignoreemptyrows=true) |> DataFrame
 cum_triangle = Matrix(cum_triangle)
 cum_triangle = convert.(Float64, cum_triangle)
 

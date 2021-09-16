@@ -418,7 +418,7 @@ ec_net = Real[bu[𝑖].net.eco_cap for 𝑖 ∈ 1:length(bu)]
 rorac_gross = Real[bu[𝑖].gross.rorac for 𝑖 ∈ 1:length(bu)]
 rorac_net = Real[bu[𝑖].net.rorac for 𝑖 ∈ 1:length(bu)]
 
-x = hcat(profit_gross, ec_gross, ec_net)
+# x = hcat(profit_gross, ec_gross, ec_net)
 
 
 ##  Portfolio Optimizations #####################################
